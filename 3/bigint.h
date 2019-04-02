@@ -44,12 +44,12 @@ public:
     BigInt &operator=(int64_t __int) {
         _string.~LinkedList();
         if (__int < 0) {
-            this->_sign = false;
+            _sign = false;
             __int = -__int;
         }
-        else this->_sign = true;
+        else _sign = true;
         do {
-            this->_string.add(__int % base);
+            _string.add(__int % base);
             __int /= base;
         } while (__int != 0);
         return *this;
@@ -57,27 +57,29 @@ public:
 
     BigInt(int64_t __int) {
         if (__int < 0) {
-            this->_sign = false;
+            _sign = false;
             __int = -__int;
         }
-        else this->_sign = true;
+        else _sign = true;
         do {
-            this->_string.add(__int % base);
+            _string.add(__int % base);
             __int /= base;
         } while (__int != 0);
     }
 
     BigInt(const BigInt &number) {
         _sign = number._sign;
-        for (size_t i = 0; i < number._string.get_length(); i++)
+        size_t i;
+        for (i = 0; i < number._string.get_length(); i++)
             _string.add(number._string[i]);
     }
 
     BigInt &operator=(const BigInt &number) {
         if (this == &number)
             return *this;
-        this->_string.~LinkedList();
-        for (size_t i = 0; i < number._string.get_length(); i++)
+        _string.~LinkedList();
+        size_t i ;
+        for (i = 0; i < number._string.get_length(); i++)
             _string.add(number._string[i]);
         _sign = number._sign;
         return *this;
@@ -86,14 +88,14 @@ public:
     BigInt operator-() const {
         BigInt tmp = BigInt(*this);
         if (!(_string.get_length() && _string[0] == 0))
-            tmp._sign = !(this->_sign);
+            tmp._sign = !_sign;
         return tmp;
     }
 
     BigInt operator+(const BigInt &number) const {
         if (_sign == number._sign) {
             BigInt tmp;
-            if (this->_string.get_length() < number._string.get_length())
+            if (_string.get_length() < number._string.get_length())
                 tmp = BigInt(number);
             else
                 tmp = BigInt(*this);
@@ -124,7 +126,7 @@ public:
     BigInt operator-(const BigInt &number) const {
         if (!(number._sign))
             return *this + (-number);
-        else if (!(this->_sign))
+        else if (!(_sign))
             return -(-(*this) + number);
         else if (*this < number)
             return -(number - (*this));
@@ -141,15 +143,15 @@ public:
     }
 
     bool operator==(const BigInt &number) const {
-        if (this->_string.get_length() != number._string.get_length())
+        if (_string.get_length() != number._string.get_length())
             return false;
-        if (this->_sign != number._sign)
+        if (_sign != number._sign)
             return false;
-        if (this->_string.get_length() == 0)
+        if (_string.get_length() == 0)
             return true;
         size_t i;
-        for (i = 0; i < this->_string.get_length(); i++)
-            if (number._string[i] != this->_string[i])
+        for (i = 0; i < _string.get_length(); i++)
+            if (number._string[i] != _string[i])
                 return false;
         return true;
     }
@@ -159,15 +161,15 @@ public:
     }
 
     bool operator<(const BigInt &number) const {
-        if (number._sign != this->_sign)
+        if (number._sign != _sign)
             return !_sign;
-        if (number._string.get_length() < this->_string.get_length())
+        if (number._string.get_length() < _string.get_length())
             return !_sign;
-        if (number._string.get_length() > this->_string.get_length())
+        if (number._string.get_length() > _string.get_length())
             return _sign;
         for (long long i = number._string.get_length() - 1; i >= 0; i--)
-            if (number._string[i] != this->_string[i])
-                if (this->_string[i] > number._string[i])
+            if (number._string[i] != _string[i])
+                if (_string[i] > number._string[i])
                     return !_sign;
                 else return _sign;
         return false;
