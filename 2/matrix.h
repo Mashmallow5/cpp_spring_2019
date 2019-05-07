@@ -65,6 +65,10 @@ public:
 
     Matrix& operator= (const Matrix &matr)
     {
+        if (this != &matr)
+        {
+            return *this;
+        }
         if(p !=matr.p && cols==matr.cols && rows==matr.rows)
         {
             for(int i=0;i<rows;i++)
