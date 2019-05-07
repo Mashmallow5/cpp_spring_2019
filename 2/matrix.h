@@ -65,7 +65,7 @@ public:
 
     Matrix& operator= (const Matrix &matr)
     {
-        if (this != &matr)
+        if (this == &matr)
         {
             return *this;
         }
