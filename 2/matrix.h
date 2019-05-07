@@ -69,6 +69,18 @@ public:
         {
             return *this;
         }
+        
+        if (rows != m.rows || cols != m.cols) {
+            for (int i = 0; i < rows; ++i) {
+                delete[] p[i];
+            }
+        delete[] p;
+
+        rows = m.rows;
+        cols = m.cols;
+        allocSpace();
+        }
+        
         if(p !=matr.p && cols==matr.cols && rows==matr.rows)
         {
             for(int i=0;i<rows;i++)
