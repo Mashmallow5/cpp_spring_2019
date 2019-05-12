@@ -30,7 +30,7 @@ int& list::operator[](size_t index)
 	return tmp->element;
 }
 
-void list::push_back(const int item)
+void list::push_back(const int item )
 {
 	if (size == 0)
 	{
