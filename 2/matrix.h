@@ -1,19 +1,19 @@
 #ifndef MATRIX_MATRIX_H
 #define MATRIX_MATRIX_H
 
- #include <iostream>
+#include <iostream>
 
- class Matrix{
+class Matrix{
 private:
-    const size_t rows;
-    const size_t cols;
+    size_t rows;
+    size_t cols;
     int **p;
 
- public:
+public:
     class Row{
         friend class Matrix;
     public:
-        int& operator[](int cols) const
+        int& operator[](size_t cols) const
         {
             if (cols >= parent.cols){
                 throw std::out_of_range("out_of_range");
@@ -21,15 +21,15 @@ private:
             return parent.p[row][cols];
         }
     private:
-        Row (Matrix& _parent, int _row):
-            parent(_parent), row(_row)
+        Row (Matrix& _parent, size_t _row):
+                parent(_parent), row(_row)
         { }
 
-         Matrix& parent;
-        int row;
+        Matrix& parent;
+        size_t row;
     };
 
-     Row operator[](int row) const
+    Row operator[](size_t row) const
     {
         if (row >= rows){
             throw std::out_of_range("out_of_range");
@@ -37,9 +37,9 @@ private:
         return *(new Row(const_cast<Matrix &>(*this), row));
     }
 
-     Matrix() : cols(0), rows(0) { }
+    Matrix() : cols(0), rows(0) { }
 
-     Matrix(const size_t _rows, const size_t _cols): rows(_rows), cols(_cols), p (nullptr)
+    Matrix(const size_t _rows, const size_t _cols): rows(_rows), cols(_cols), p (nullptr)
     {
         allocSpace();
         for (int i =0; i < _rows; ++i){
@@ -51,7 +51,7 @@ private:
     }
 
 
-     Matrix(const Matrix& m): rows(m.rows), cols(m.cols)
+    Matrix(const Matrix& m): rows(m.rows), cols(m.cols)
     {
         allocSpace();
         for (int i = 0; i < rows; ++i){
@@ -62,8 +62,22 @@ private:
         }
     }
 
-     Matrix& operator= (const Matrix &matr)
+    Matrix& operator= (const Matrix &matr)
     {
+        if (this == &matr) {
+            return *this;
+        }
+
+        if (rows != matr.rows || cols != matr.cols) {
+            for (int i = 0; i < rows; ++i) {
+                delete[] p[i];
+            }
+            delete[] p;
+
+            rows = matr.rows;
+            cols = matr.cols;
+            allocSpace();
+        }
         if(p !=matr.p && cols==matr.cols && rows==matr.rows)
         {
             for(int i=0;i<rows;i++)
@@ -73,7 +87,7 @@ private:
         return *this;
     }
 
-     Matrix& operator*=(int num)
+    Matrix& operator*=(int num)
     {
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
@@ -83,17 +97,17 @@ private:
         return *this;
     }
 
-     size_t getColumns() {return cols;}
+    size_t getColumns() {return cols;}
     size_t getRows() {return rows;}
 
-     void allocSpace() {
+    void allocSpace() {
         p = new int*[rows];
         for (int i = 0; i < rows; ++i) {
             p[i] = new int[cols];
         }
     }
 
-     bool operator== (const Matrix &matr) const {
+    bool operator== (const Matrix &matr) const {
         if (this == &matr)
             return true;
         if(cols != matr.cols || rows != matr.rows)
@@ -105,11 +119,11 @@ private:
         return true;
     }
 
-     bool operator!= (const Matrix &matr) const {
+    bool operator!= (const Matrix &matr) const {
         return !(*this == matr);
     }
 
-     ~Matrix()
+    ~Matrix()
     {
         for (int i = 0; i < rows; ++i) {
             delete[] p[i];
@@ -117,8 +131,8 @@ private:
         delete[] p;
     }
 
- };
+};
 
 
 
- #endif //MATRIX_MATRIX_H
+#endif //MATRIX_MATRIX_H
