@@ -1,141 +1,106 @@
-#ifndef MATRIX_MATRIX_H
-#define MATRIX_MATRIX_H
+#ifndef _MATRIX_H
+#define _MATRIX_H
 
-#include <iostream>
+#include <vector>
 
-class Matrix{
-private:
-    const size_t rows;
-    const size_t cols;
-    int **p;
-
-public:
-    class Row{
-        friend class Matrix;
-    public:
-        int& operator[](const int cols) const
-        {
-            if (cols >= parent.cols){
-                throw std::out_of_range("out_of_range");
-            }
-            return parent.p[row][cols];
-        }
-        ~Row() = default;
-    private:
-        Row (const Matrix& _parent, int _row):
-            parent(_parent), row(_row)
-        { }
-
-        const Matrix& parent;
-        int row;
-    };
-
-    Row operator[](int row) const
-    {
-        if (row >= rows){
-            throw std::out_of_range("out_of_range");
-        }
-        return *(new Row(*this, row));
-    }
-
-    Matrix() : cols(0), rows(0) { }
-
-    Matrix(const size_t _rows, const size_t _cols): rows(_rows), cols(_cols), p (nullptr)
-    {
-        allocSpace();
-        for (int i =0; i < _rows; ++i){
-            for (int j = 0; j < _cols; ++j)
-            {
-                p[i][j] = 0;
-            }
-        }
-    }
-
-
-    Matrix(const Matrix& m): rows(m.rows), cols(m.cols)
-    {
-        allocSpace();
-        for (int i = 0; i < rows; ++i){
-            for (int j = 0; j < cols; ++j)
-            {
-                p[i][j] = m.p[i][j];
-            }
-        }
-    }
-
-    Matrix& operator= (const Matrix &matr)
-    {
-        if (this == &matr)
-        {
-            return *this;
-        }
-        
-        if (rows != m.rows || cols != m.cols) {
-            for (int i = 0; i < rows; ++i) {
-                delete[] p[i];
-            }
-        delete[] p;
-
-        rows = m.rows;
-        cols = m.cols;
-        allocSpace();
-        }
-        
-        if(p !=matr.p && cols==matr.cols && rows==matr.rows)
-        {
-            for(int i=0;i<rows;i++)
-                for(int j=0;j<cols;j++)
-                    p[i][j]=matr.p[i][j];
-        }
-        return *this;
-    }
-
-    Matrix& operator*=(int num)
-    {
-        for (int i = 0; i < rows; ++i) {
-            for (int j = 0; j < cols; ++j) {
-                p[i][j] *= num;
-            }
-        }
-        return *this;
-    }
-
-    size_t getColumns() {return cols;}
-    size_t getRows() {return rows;}
-
-    void allocSpace() {
-        p = new int*[rows];
-        for (int i = 0; i < rows; ++i) {
-            p[i] = new int[cols];
-        }
-    }
-
-    bool operator== (const Matrix &matr) const {
-        if (this == &matr)
-            return true;
-        if(cols != matr.cols || rows != matr.rows)
-            return false;
-        for(int i = 0; i < rows; i++)
-            for(int j = 0; j < cols; j++)
-                if(p[i][j] != matr.p[i][j])
-                    return false;
-        return true;
-    }
-
-    bool operator!= (const Matrix &matr) const {
-        return !(*this == matr);
-    }
-
-    ~Matrix()
-    {
-        for (int i = 0; i < rows; ++i) {
-            delete[] p[i];
-        }
-        delete[] p;
-    }
-
+class MatrixProxy {
+  
+  public:
+	MatrixProxy(std::vector<int> * matrix, size_t columns)
+			: matr(matrix),
+			  columns(columns) {}
+	
+	~MatrixProxy() {}
+	
+	int &operator[](int i) {
+		if (i >= columns)
+			throw std::out_of_range("Выход за пределы матрицы\n");
+		return (*matr)[i];
+	}
+	
+	const int &operator[](int i) const {
+		if (i >= columns)
+			throw std::out_of_range("Выход за пределы матрицы\n");
+		return (*matr)[i];
+	}
+  
+  private:
+	std::vector<int> * matr;
+	size_t columns;
 };
 
+class Matrix {
+  
+  public:
+	Matrix(size_t rows = 0, size_t columns = 0) {
+		rowsNumber = rows;
+		columnsNumber = columns;
+		if (rows != 0 && columns != 0) {
+			matrix = new std::vector<int>[rows];
+			for (int i = 0; i < rows; i++)
+				matrix[i].resize(columns, 0);
+		}
+	}
+	
+	~Matrix() {
+		if (columnsNumber != 0 && rowsNumber != 0)
+			delete[] matrix;
+	}
+	
+	size_t getRows() {
+		return rowsNumber;
+	}
+	
+	size_t getColumns() {
+		return columnsNumber;
+	}
+	
+	MatrixProxy operator[](int i) {
+		if (i >= rowsNumber)
+			throw std::out_of_range("Выход за пределы матрицы\n");
+		return MatrixProxy(&matrix[i], columnsNumber);
+	}
+	
+	const MatrixProxy operator[](int i) const {
+		if (i >= rowsNumber)
+			throw std::out_of_range("Выход за пределы матрицы\n");
+		return MatrixProxy(&matrix[i], columnsNumber);
+	}
+	
+	bool operator==(const Matrix &other) const {
+		if (other.columnsNumber != columnsNumber || other.rowsNumber != rowsNumber)
+			return false;
+		for (int i = 0; i < rowsNumber; i++)
+			for (int j = 0; j < columnsNumber; j++)
+				if (other.matrix[i][j] != matrix[i][j])
+					return false;
+		return true;
+	}
+	
+	bool operator!=(const Matrix &other) const {
+		return !(this->operator==(other));
+	}
+	
+	Matrix &operator*=(int num) {
+		for (int i = 0; i < rowsNumber; i++)
+			for (int j = 0; j < columnsNumber; j++)
+				matrix[i][j] *= num;
+		return *this;
+	}
+	
+	friend std::ostream &operator<<(std::ostream &s, Matrix &matr) {
+		for (int i = 0; i < matr.rowsNumber; i++) {
+			for (int j = 0; j < matr.columnsNumber; j++)
+				s << matr.matrix[i][j] << "  ";
+			s << std::endl;
+		}
+		return s;
+	}
+  
+  private:
+	size_t rowsNumber;
+	size_t columnsNumber;
+	std::vector<int> * matrix;
+};
 
-
-#endif //MATRIX_MATRIX_H
+#endif //_MATRIX_H
