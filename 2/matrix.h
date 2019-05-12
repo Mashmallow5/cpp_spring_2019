@@ -14,13 +14,13 @@ class MatrixProxy {
 	
 	int &operator[](int i) {
 		if (i >= columns)
-			throw std::out_of_range("Выход за пределы матрицы\n");
+			throw std::out_of_range("Out of range\n");
 		return (*matr)[i];
 	}
 	
 	const int &operator[](int i) const {
 		if (i >= columns)
-			throw std::out_of_range("Выход за пределы матрицы\n");
+			throw std::out_of_range("Out of range\n");
 		return (*matr)[i];
 	}
   
@@ -57,13 +57,13 @@ class Matrix {
 	
 	MatrixProxy operator[](int i) {
 		if (i >= rowsNumber)
-			throw std::out_of_range("Выход за пределы матрицы\n");
+			throw std::out_of_range("Out of range\n");
 		return MatrixProxy(&matrix[i], columnsNumber);
 	}
 	
 	const MatrixProxy operator[](int i) const {
 		if (i >= rowsNumber)
-			throw std::out_of_range("Выход за пределы матрицы\n");
+			throw std::out_of_range("Out of range\n");
 		return MatrixProxy(&matrix[i], columnsNumber);
 	}
 	
