@@ -15,17 +15,17 @@ public:
     public:
         int& operator[](size_t cols) const
         {
-            if (cols >= parent.cols){
+            if (cols >= parent->cols){
                 throw std::out_of_range("out_of_range");
             }
-            return parent.p[row][cols];
+            return parent->p[row][cols];
         }
     private:
-        Row (Matrix& _parent, size_t _row):
-                parent(_parent), row(_row)
+        Row (const Matrix* _parent, size_t _row):
+                parent(const_cast<Matrix *>(_parent)), row(_row)
         { }
 
-        Matrix& parent;
+        Matrix *parent;
         size_t row;
     };
 
@@ -34,7 +34,7 @@ public:
         if (row >= rows){
             throw std::out_of_range("out_of_range");
         }
-        return *(new Row(const_cast<Matrix &>(*this), row));
+        return *(new Row(this, row));
     }
 
     Matrix() : cols(0), rows(0) { }
